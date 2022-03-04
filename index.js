@@ -1,22 +1,55 @@
 const colorForm = document.getElementById('form-color');
-const colorsDiv = document.getElementById('colors');
+const colorsDiv = document.getElementById('colorsDiv');
 const mode = document.getElementById('mode');
 const colorPicked = document.getElementById('color-picked');
 
-function getColors(hex, mode){
-    fetch(`https://www.thecolorapi.com/scheme?hex=${hex}&mode=${mode}&count=5`)
+let hexValue = colorPicked.value.slice(1,7);
+let modeValue = mode.value;
+let colorList = [];
+let colorListHtml = "";
+
+function getColors(){
+    fetch(`https://www.thecolorapi.com/scheme?hex=${hexValue}&mode=${modeValue}&count=5`)
         .then(res => res.json())
-        .then(data => console.log(data));
+        .then(data => {
+            for (const color of data.colors){
+                colorList.push(color.hex.value);
+            }
+            displayColors();
+        });
+}
+
+function displayColors(){
+    for (let color of colorList){
+        colorListHtml += `
+        <div class="color">
+            <div class="backgroundColor" style="background-color: ${color}"></div>
+            <div>${color}</div>
+        </div>
+        `;
+    }
+    colorsDiv.innerHTML = colorListHtml;
+}
+
+function reset(){
+    colorList = [];
+    colorListHtml = "";
+    colorsDiv.innerHTML = "";
 }
 
 colorForm.addEventListener('submit', function(event){
     event.preventDefault();
 
-    let hexValue = colorPicked.value.slice(1,7);
-    let modeValue = mode.value;
+    hexValue = colorPicked.value.slice(1,7);
+    modeValue = mode.value;
 
-    console.log(hexValue);
-
-    getColors(hexValue, modeValue);
+    reset();
+    getColors();
+    
 })
+
+getColors();
+
+
+
 
